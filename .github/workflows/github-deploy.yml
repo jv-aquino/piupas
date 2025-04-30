@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Configuração do Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build do projeto (com exportação estática)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+
+      - name: Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          
+      - name: Atualizar URL do GitHub Pages no README
+        run: |
+          # Obter o nome do usuário ou organização do GitHub
+          GITHUB_USERNAME=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 1)
+          REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          GITHUB_PAGES_URL="https://$GITHUB_USERNAME.github.io/$REPO_NAME/"
+
+          # Substituir o marcador pelo URL real
+          sed -i "s|<!-- GITHUB_PAGES_URL -->|$GITHUB_PAGES_URL|g" README.md
+
+          # Configurar Git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Commit e push das alterações
+          git add README.md
+          git commit -m "docs: atualiza URL do GitHub Pages no README" || echo "Sem alterações para commit"
+          git push
