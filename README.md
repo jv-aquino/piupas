@@ -8,7 +8,7 @@ Este template faz parte do programa de capacitação técnica da Poli Junior, pr
 
 ## 🔎 Demonstração
 
-Uma demonstração online deste template está disponível em:  <!-- GITHUB_PAGES_URL -->
+Uma demonstração online deste template está disponível em:  https://jv-aquino.github.io/piupas/
 
 ## 🛠️ Tecnologias e ferramentas
 
